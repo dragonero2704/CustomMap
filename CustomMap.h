@@ -7,7 +7,7 @@ using namespace std;
 template <class Key, class Value>
 class CustomMap
 {
-	template <class Key, class Value>
+	template <class A, class B>
 	friend class Node;
 private:
 	Node<Key, Value>* root;

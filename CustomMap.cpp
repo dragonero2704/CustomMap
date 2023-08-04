@@ -17,6 +17,7 @@ template<class Key, class Value>
 CustomMap<Key, Value>::~CustomMap()
 {
 	if (this->root != nullptr) this->recDelete(this->root);
+	else delete this->root;
 }
 
 template<class Key, class Value>

@@ -4,7 +4,7 @@
 template <class Key, class Value>
 class Node
 {
-	template <class Key, class Value>
+	template <class A, class B>
 	friend class CustomMap;
 private:
 	Key key;
@@ -19,6 +19,7 @@ private:
 public:
 	Node();
 	Node(Key key, Value value);
+	~Node();
 	Key getKey();
 	Value getValue();
 	

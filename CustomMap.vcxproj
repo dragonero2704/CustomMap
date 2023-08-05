@@ -129,10 +129,9 @@
   <ItemGroup>
     <ClInclude Include="CustomMap.h" />
     <ClInclude Include="CustomNode.h" />
+    <ClInclude Include="macros.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CustomMap.cpp" />
-    <ClCompile Include="CustomNode.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

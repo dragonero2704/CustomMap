@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CustomDisplayNode.h" />
     <ClInclude Include="CustomMap.h" />
     <ClInclude Include="CustomNode.h" />
     <ClInclude Include="macros.h" />

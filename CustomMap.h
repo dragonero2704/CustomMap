@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
+#ifndef NODE_INCLUDE
+#define NODE_INCLUDE
 #include "CustomNode.h"
+#endif
 #include "macros.h"
 using namespace std;
 
@@ -8,29 +11,27 @@ using namespace std;
 template <class Key, class Value>
 class CustomMap
 {
-	template <class A, class B>
+	template <class Key, class Value>
 	friend class Node;
 private:
 	Node<Key, Value>* root;
 	unsigned int _size;
 
 	void realInsert(Node<Key, Value>* node) {
-		
 		if (this->root == nullptr) {
 			this->root = node;
-			this->root->color = BLACK;
 		}
 		else
 		{
 			// inserimento
 			Node<Key, Value>* tmp = this->root;
 			Node<Key, Value>* tmpParent = tmp->parent;
-
-
+			this->_size++;
 			while (tmp != nullptr) {
 				if (node->key == tmp->key) 
 				{
-					tmp->value = node->value;
+					this->_size--;
+					tmp->update(node->value);
 					return;
 				} 
 				if (node->key > tmp->key) {
@@ -57,7 +58,7 @@ private:
 				tmpParent->left = node;
 			}
 			//correctly inserted
-			this->_size++;
+			
 			//RB balacing cases
 			case1(node);
 		}
@@ -247,12 +248,298 @@ public:
 			{
 				//definisco il nuovo elemento
 				Node<Key, Value>* node = new Node<Key, Value>(key, Value());
-				this->insert(*node);
+				this->realInsert(node);
+				// info("Insertion value: %d", node->value);
 				return node->value;
 			}
 		}
 		return tmp->value;
 	};
+	void empty() {
+		if(this->root!=nullptr) this->recDelete(this->root);
+		this->_size = 0;
+	}
+
+	//iterator class definition
+	class Iterator {
+		
+	private:
+		Node<Key, Value>* ptr;
+	public:
+		Iterator() {
+			this->ptr = nullptr;
+		}
+
+		Iterator(Node<Key, Value>* node) {
+			node->update();
+			this->ptr = node;
+		}
+		~Iterator() {}
+
+		void operator++(int) {
+			if (this->ptr == nullptr) return;
+			Node<Key, Value>* nodocorr = this->ptr;
+
+			Key key = this->ptr->key;
+			if (nodocorr->right != nullptr)
+			{
+				nodocorr = nodocorr->right;
+
+				// controllo se ci sono rami minori
+				while (nodocorr->left != nullptr && key < nodocorr->left->key)
+				{
+					nodocorr = nodocorr->left;
+				}
+				this->ptr = nodocorr;
+				return;
+			}
+			else
+			{
+				if (nodocorr->parent != nullptr)
+				{
+					nodocorr = nodocorr->parent;
+					while (nodocorr->key < key)
+					{
+						if (nodocorr->parent == nullptr)
+						{
+							this->ptr = nullptr;
+							return;
+						}
+						nodocorr = nodocorr->parent;
+					}
+
+					while (nodocorr->left != nullptr && key < nodocorr->left->key)
+					{
+						nodocorr = nodocorr->left;
+					}
+					nodocorr->update();
+					this->ptr = nodocorr;
+					return;
+				}
+			}
+		}
+
+		void operator--(int) {
+			if (this->ptr == nullptr) return;
+			Node<Key, Value>* nodocorr = this->ptr;
+			Key key = ptr->key;
+			if (nodocorr->left != nullptr)
+			{
+				nodocorr = nodocorr->left;
+				while (nodocorr->right != nullptr && nodocorr->right->key < key)
+				{
+					nodocorr = nodocorr->right;
+				}
+				this->ptr = nodocorr;
+				return;
+			}
+			else
+			{
+				if (nodocorr->parent != nullptr)
+				{
+					nodocorr = nodocorr->parent;
+					while (key < nodocorr->key)
+					{
+						if (nodocorr->parent == nullptr)
+						{
+							this->ptr = nullptr;
+							return;
+						}
+						nodocorr = nodocorr->parent;
+					}
+
+					while (nodocorr->right != nullptr && nodocorr->right->key < key)
+					{
+						nodocorr = nodocorr->right;
+					}
+					this->ptr = nodocorr;
+					return;
+				}
+				this->ptr = nullptr;
+			}
+		}
+
+		DisplayNode<Key, Value>* operator->()
+		{
+			
+			if (this->ptr == nullptr) return nullptr;
+			this->ptr->update();
+			return this->ptr->display;
+		}
+		DisplayNode<Key, Value>* operator*()
+		{
+			if (this->ptr == nullptr) return nullptr;
+			this->ptr->update();
+			return this->ptr->display;
+		}
+
+		bool operator!=(Iterator other) {
+			if (this->ptr == nullptr) {
+				return *other != nullptr;
+			}
+			this->ptr->update();
+			return *other != this->ptr->display;
+		}
+		bool operator==(Iterator other)  {
+			if (this->ptr == nullptr) {
+				return *other == nullptr;
+			}
+			this->ptr->update();
+			return *other == this->ptr->display;
+		}
+	};
+
+	Iterator begin() {
+		if (this->root == nullptr) return Iterator();
+		Node<Key, Value>* tmp = this->root;
+		while (tmp->left != nullptr) {
+			tmp = tmp->left;
+		}
+		return Iterator(tmp);
+		
+	}
+
+	Iterator end(){
+		return Iterator();
+	}
+	// ReverseIterator class definition
+	class ReverseIterator {
+	private:
+		Node<Key, Value>* ptr;
+	public:
+		ReverseIterator() {
+			this->ptr = nullptr;
+		}
+		ReverseIterator(Node<Key, Value>* node) {
+			node->update();
+			this->ptr = node;
+		}
+		~ReverseIterator() {}
+		void operator++(int) {
+			if (this->ptr == nullptr) return;
+			Node<Key, Value>* nodocorr = this->ptr;
+			Key key = ptr->key;
+			if (nodocorr->left != nullptr)
+			{
+				nodocorr = nodocorr->left;
+				while (nodocorr->right != nullptr && nodocorr->right->key > key)
+				{
+					nodocorr = nodocorr->right;
+				}
+				this->ptr = nodocorr;
+				return;
+			}
+			else
+			{
+				if (nodocorr->parent != nullptr)
+				{
+					nodocorr = nodocorr->parent;
+					while (key > nodocorr->key)
+					{
+						if (nodocorr->parent == nullptr)
+						{
+							this->ptr = nullptr;
+							return;
+						}
+						nodocorr = nodocorr->parent;
+					}
+
+					while (nodocorr->right != nullptr && nodocorr->right->key > key)
+					{
+						nodocorr = nodocorr->right;
+					}
+					this->ptr = nodocorr;
+					return;
+				}
+				this->ptr = nullptr;
+			}
+		};
+		void operator--(int) {
+			if (this->ptr == nullptr) return;
+			Node<Key, Value>* nodocorr = this->ptr;
+
+			Key key = this->ptr->key;
+			if (nodocorr->right != nullptr)
+			{
+				nodocorr = nodocorr->right;
+
+				// controllo se ci sono rami minori
+				while (nodocorr->left != nullptr && key < nodocorr->left->key)
+				{
+					nodocorr = nodocorr->left;
+				}
+				this->ptr = nodocorr;
+				return;
+			}
+			else
+			{
+				if (nodocorr->parent != nullptr)
+				{
+					nodocorr = nodocorr->parent;
+					while (nodocorr->key < key)
+					{
+						if (nodocorr->parent == nullptr)
+						{
+							this->ptr = nullptr;
+							return;
+						}
+						nodocorr = nodocorr->parent;
+					}
+
+					while (nodocorr->left != nullptr && key < nodocorr->left->key)
+					{
+						nodocorr = nodocorr->left;
+					}
+					nodocorr->update();
+					this->ptr = nodocorr;
+					return;
+				}
+			}
+		};
+
+		DisplayNode<Key, Value>* operator->()
+		{
+
+			if (this->ptr == nullptr) return nullptr;
+			this->ptr->update();
+			return this->ptr->display;
+		}
+		DisplayNode<Key, Value>* operator*()
+		{
+			if (this->ptr == nullptr) return nullptr;
+			this->ptr->update();
+			return this->ptr->display;
+		}
+
+		bool operator!=(ReverseIterator other) {
+			if (this->ptr == nullptr) {
+				return *other != nullptr;
+			}
+			this->ptr->update();
+			return *other != this->ptr->display;
+		}
+		bool operator==(ReverseIterator other) {
+			if (this->ptr == nullptr) {
+				return *other == nullptr;
+			}
+			this->ptr->update();
+			return *other == this->ptr->display;
+		}
+		
+	};
+	ReverseIterator rbegin() {
+		Node<Key, Value>* tmp = this->root;
+		if (tmp == nullptr) return ReverseIterator();
+
+		while (tmp->right != nullptr) {
+			tmp = tmp->right;
+		}
+		ReverseIterator rit(tmp);
+	}
+
+	ReverseIterator rend() {
+		return ReverseIterator();
+	}
 };
 
 

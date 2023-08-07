@@ -7,7 +7,6 @@
 
 #include <map>
 
-//#include "CustomNode.cpp"
 using namespace std;
 
 
@@ -42,14 +41,9 @@ int main() {
 	info("Size: %d", mp.size());
 
 	info("Stampa tramite reverse iterator");
-	for (auto it = mp.begin(); it != mp.end(); it++) {
+	for (auto it = mp.rbegin(); it != mp.rend(); it++) {
 		cout << it->first << " " << it->second << endl;
 	}
-	/*for (auto it = mp.rbegin(); it != mp.rend(); it++) {
-		cout << it->first << " " << it->second << endl;
-	}*/
 	
-
-
 	return 0;
 }

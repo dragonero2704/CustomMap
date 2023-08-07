@@ -326,7 +326,7 @@ public:
 			if (nodocorr->left != nullptr)
 			{
 				nodocorr = nodocorr->left;
-				while (nodocorr->right != nullptr && nodocorr->right->key < key)
+				while (nodocorr->right != nullptr && nodocorr->right->key > key)
 				{
 					nodocorr = nodocorr->right;
 				}
@@ -338,7 +338,9 @@ public:
 				if (nodocorr->parent != nullptr)
 				{
 					nodocorr = nodocorr->parent;
-					while (key < nodocorr->key)
+					// se la chiave del parent è ancora maggiore della
+					// chiave iniziale, passo al parent successivo
+					while (nodocorr->key > key)
 					{
 						if (nodocorr->parent == nullptr)
 						{
@@ -348,10 +350,12 @@ public:
 						nodocorr = nodocorr->parent;
 					}
 
-					while (nodocorr->right != nullptr && nodocorr->right->key < key)
+					// finché la chiave di nodocorr->right è minore di key
+					while (nodocorr->right != nullptr && key > nodocorr->right->key)
 					{
 						nodocorr = nodocorr->right;
 					}
+					nodocorr->update();
 					this->ptr = nodocorr;
 					return;
 				}
@@ -373,14 +377,14 @@ public:
 			return this->ptr->display;
 		}
 
-		bool operator!=(Iterator other) {
+		bool operator!=(Iterator other) const {
 			if (this->ptr == nullptr) {
 				return *other != nullptr;
 			}
 			this->ptr->update();
 			return *other != this->ptr->display;
 		}
-		bool operator==(Iterator other)  {
+		bool operator==(Iterator other) const  {
 			if (this->ptr == nullptr) {
 				return *other == nullptr;
 			}
@@ -434,7 +438,9 @@ public:
 				if (nodocorr->parent != nullptr)
 				{
 					nodocorr = nodocorr->parent;
-					while (key > nodocorr->key)
+					// se la chiave del parent è ancora maggiore della
+					// chiave iniziale, passo al parent successivo
+					while (nodocorr->key > key)
 					{
 						if (nodocorr->parent == nullptr)
 						{
@@ -444,10 +450,12 @@ public:
 						nodocorr = nodocorr->parent;
 					}
 
-					while (nodocorr->right != nullptr && nodocorr->right->key > key)
+					// finché la chiave di nodocorr->right è minore di key
+					while (nodocorr->right != nullptr && key > nodocorr->right->key)
 					{
 						nodocorr = nodocorr->right;
 					}
+					nodocorr->update();
 					this->ptr = nodocorr;
 					return;
 				}
@@ -499,7 +507,6 @@ public:
 
 		DisplayNode<Key, Value>* operator->()
 		{
-
 			if (this->ptr == nullptr) return nullptr;
 			this->ptr->update();
 			return this->ptr->display;
@@ -511,14 +518,14 @@ public:
 			return this->ptr->display;
 		}
 
-		bool operator!=(ReverseIterator other) {
+		bool operator!=(ReverseIterator other) const {
 			if (this->ptr == nullptr) {
 				return *other != nullptr;
 			}
 			this->ptr->update();
 			return *other != this->ptr->display;
 		}
-		bool operator==(ReverseIterator other) {
+		bool operator==(ReverseIterator other) const {
 			if (this->ptr == nullptr) {
 				return *other == nullptr;
 			}

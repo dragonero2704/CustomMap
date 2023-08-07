@@ -534,7 +534,7 @@ public:
 		while (tmp->right != nullptr) {
 			tmp = tmp->right;
 		}
-		ReverseIterator rit(tmp);
+		return ReverseIterator(tmp);
 	}
 
 	ReverseIterator rend() {

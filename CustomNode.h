@@ -3,10 +3,6 @@
 #define BLACK 0 //false
 #define RED 1 //true
 
-#ifndef DISPLAYNODE_INCLUDE
-#define DISPLAYNODE_INCLUDE
-#include "CustomDisplayNode.h"
-#endif
 
 template <class Key, class Value>
 class Node
@@ -22,10 +18,6 @@ private:
 	Node<Key, Value>* left;
 	Node<Key, Value>* right;
 	bool color;
-
-	// Mock node to display when
-	// operator* operator-> are called
-	DisplayNode<Key, Value>* display;
 
 	Node<Key, Value>* uncle() 
 	{
@@ -62,17 +54,11 @@ private:
 		return this->parent->right == this;
 	}
 
-	void update() {
-		this->display->updateReference(this);
-	}
-
-	void update(Value value) {
-		this->value = value;
-		this->display->updateReference(this);
-	}
-
 public:
-
+	// const reference to key
+	const Key& first = this->key;
+	// const reference to value
+	const Value& second = this->value;
 
 	Node(void) {
 		this->key = Key();
@@ -81,8 +67,6 @@ public:
 		this->left = nullptr;
 		this->right = nullptr;
 		this->color = RED;
-
-		this->display = new DisplayNode<Key, Value>(this);
 	};
 	Node(Key key, Value value) {
 		this->key = key;
@@ -91,16 +75,8 @@ public:
 		this->left = nullptr;
 		this->right = nullptr;
 		this->color = RED;
-
-		this->display = new DisplayNode<Key, Value>(this);
 	};
 	~Node(void) {};
-	Key getKey() {
-		return this->key;
-	};
-	Value getValue() {
-		return this->value;
-	};
 	bool operator!=(Node<Key, Value>& other) const {
 		return this->key != other->key;
 	}
@@ -108,12 +84,11 @@ public:
 		return this->key == other->key;
 	}
 
-	DisplayNode<Key,Value>* operator*() {
-		return this->display;
+	Node<Key,Value>* operator*() {
+		return this;
 	}
 
-	DisplayNode<Key, Value>* operator->() {
-		return this->display;
+	Node<Key, Value>* operator->() {
+		return this;
 	}
 };
-

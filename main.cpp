@@ -44,6 +44,6 @@ int main() {
 	for (auto it = mp.rbegin(); it != mp.rend(); it++) {
 		cout << it->first << " " << it->second << endl;
 	}
-	
+
 	return 0;
 }

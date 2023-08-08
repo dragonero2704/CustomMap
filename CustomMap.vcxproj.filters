@@ -24,9 +24,6 @@
     <ClInclude Include="macros.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="CustomDisplayNode.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

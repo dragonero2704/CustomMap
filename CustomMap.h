@@ -31,7 +31,6 @@ private:
 				if (node->key == tmp->key) 
 				{
 					this->_size--;
-					tmp->update(node->value);
 					return;
 				} 
 				if (node->key > tmp->key) {
@@ -271,7 +270,6 @@ public:
 		}
 
 		Iterator(Node<Key, Value>* node) {
-			node->update();
 			this->ptr = node;
 		}
 		~Iterator() {}
@@ -312,7 +310,6 @@ public:
 					{
 						nodocorr = nodocorr->left;
 					}
-					nodocorr->update();
 					this->ptr = nodocorr;
 					return;
 				}
@@ -355,7 +352,7 @@ public:
 					{
 						nodocorr = nodocorr->right;
 					}
-					nodocorr->update();
+					 
 					this->ptr = nodocorr;
 					return;
 				}
@@ -363,33 +360,20 @@ public:
 			}
 		}
 
-		DisplayNode<Key, Value>* operator->()
+		Node<Key, Value>* operator->()
 		{
-			
-			if (this->ptr == nullptr) return nullptr;
-			this->ptr->update();
-			return this->ptr->display;
+			return this->ptr;
 		}
-		DisplayNode<Key, Value>* operator*()
+		Node<Key, Value>* operator*()
 		{
-			if (this->ptr == nullptr) return nullptr;
-			this->ptr->update();
-			return this->ptr->display;
+			return this->ptr;
 		}
 
 		bool operator!=(Iterator other) const {
-			if (this->ptr == nullptr) {
-				return *other != nullptr;
-			}
-			this->ptr->update();
-			return *other != this->ptr->display;
+			return *other != this->ptr;
 		}
 		bool operator==(Iterator other) const  {
-			if (this->ptr == nullptr) {
-				return *other == nullptr;
-			}
-			this->ptr->update();
-			return *other == this->ptr->display;
+			return *other == this->ptr;
 		}
 	};
 
@@ -415,7 +399,6 @@ public:
 			this->ptr = nullptr;
 		}
 		ReverseIterator(Node<Key, Value>* node) {
-			node->update();
 			this->ptr = node;
 		}
 		~ReverseIterator() {}
@@ -455,7 +438,7 @@ public:
 					{
 						nodocorr = nodocorr->right;
 					}
-					nodocorr->update();
+					 
 					this->ptr = nodocorr;
 					return;
 				}
@@ -498,39 +481,27 @@ public:
 					{
 						nodocorr = nodocorr->left;
 					}
-					nodocorr->update();
+					 
 					this->ptr = nodocorr;
 					return;
 				}
 			}
 		};
 
-		DisplayNode<Key, Value>* operator->()
+		Node<Key, Value>* operator->()
 		{
-			if (this->ptr == nullptr) return nullptr;
-			this->ptr->update();
-			return this->ptr->display;
+			return this->ptr;
 		}
-		DisplayNode<Key, Value>* operator*()
+		Node<Key, Value>* operator*()
 		{
-			if (this->ptr == nullptr) return nullptr;
-			this->ptr->update();
-			return this->ptr->display;
+			return this->ptr;
 		}
 
 		bool operator!=(ReverseIterator other) const {
-			if (this->ptr == nullptr) {
-				return *other != nullptr;
-			}
-			this->ptr->update();
-			return *other != this->ptr->display;
+			return *other != this->ptr;
 		}
 		bool operator==(ReverseIterator other) const {
-			if (this->ptr == nullptr) {
-				return *other == nullptr;
-			}
-			this->ptr->update();
-			return *other == this->ptr->display;
+			return *other == this->ptr;
 		}
 		
 	};
@@ -548,8 +519,3 @@ public:
 		return ReverseIterator();
 	}
 };
-
-
-
-
-

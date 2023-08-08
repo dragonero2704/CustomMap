@@ -7,18 +7,23 @@
 template <class Key, class Value>
 class Node
 {
+	// this way the CustomMap class can access private attributes and methods
 	template <class Key, class Value>
 	friend class CustomMap;
-	template <class Key, class Value>
-	friend class DisplayNode;
 private:
+	// key of the Node, used to build the binary tree
 	Key key;
+	// value of each node
 	Value value;
+
 	Node<Key, Value>* parent;
 	Node<Key, Value>* left;
 	Node<Key, Value>* right;
+
+	// used for RB balancing of the binary tree
 	bool color;
 
+	// Helper function for bilancing the binary tree
 	Node<Key, Value>* uncle() 
 	{
 		Node<Key, Value>* grandparent = this->grandparent();
@@ -60,6 +65,7 @@ public:
 	// const reference to value
 	const Value& second = this->value;
 
+	// constructors definitions
 	Node(void) {
 		this->key = Key();
 		this->value = Value();
@@ -76,7 +82,11 @@ public:
 		this->right = nullptr;
 		this->color = RED;
 	};
+
+	// empty destructor
 	~Node(void) {};
+
+	// operators definitions
 	bool operator!=(Node<Key, Value>& other) const {
 		return this->key != other->key;
 	}

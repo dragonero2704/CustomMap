@@ -28,7 +28,7 @@ int main() {
 
 	srand(time(NULL));
 	int key,value;
-	int MAX = 10;
+	int MAX = 10000;
 	for (int i = 0; i < MAX; i++) {
 		key = rand() % MAX;
 		value = rand() % MAX;
@@ -50,6 +50,8 @@ int main() {
 	for (auto it = mp.rbegin(); it != mp.rend(); it++) {
 		cout << it->first << " " << it->second << endl;
 	}
+	info("Size: %lld", mp.size());
+
 
 	return 0;
 }

@@ -28,7 +28,7 @@ int main() {
 
 	srand(time(NULL));
 	int key,value;
-	int MAX = 10000;
+	int MAX = 10;
 	for (int i = 0; i < MAX; i++) {
 		key = rand() % MAX;
 		value = rand() % MAX;
@@ -47,11 +47,10 @@ int main() {
 	info("Size: %lld", mp.size());
 
 	info("Stampa tramite reverse iterator");
-	for (auto it = mp.rbegin(); it != mp.rend(); it++) {
-		cout << it->first << " " << it->second << endl;
+	for (auto rit = mp.rbegin(); rit != mp.rend(); rit++) {
+		cout << rit->first << " " << rit->second << endl;
 	}
 	info("Size: %lld", mp.size());
-
 
 	return 0;
 }

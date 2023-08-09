@@ -62,8 +62,8 @@ private:
 public:
 	// const reference to key
 	const Key& first = this->key;
-	// const reference to value
-	const Value& second = this->value;
+	// reference to value
+	Value& second = this->value;
 
 	// constructors definitions
 	Node(void) {

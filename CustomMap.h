@@ -96,7 +96,6 @@ private:
 		}
 		case5(node);
 	};
-	
 	void case5(Node<Key, Value>* node) {
 		// info("Case 5");
 		node->parent->color = BLACK;
@@ -318,7 +317,7 @@ public:
 			if (nodocorr->left != nullptr)
 			{
 				nodocorr = nodocorr->left;
-				while (nodocorr->right != nullptr && nodocorr->right->key > key)
+				while (nodocorr->right != nullptr && nodocorr->right->key <  key)
 				{
 					nodocorr = nodocorr->right;
 				}
@@ -330,8 +329,6 @@ public:
 				if (nodocorr->parent != nullptr)
 				{
 					nodocorr = nodocorr->parent;
-					// se la chiave del parent è ancora maggiore della
-					// chiave iniziale, passo al parent successivo
 					while (nodocorr->key > key)
 					{
 						if (nodocorr->parent == nullptr)
@@ -341,13 +338,7 @@ public:
 						}
 						nodocorr = nodocorr->parent;
 					}
-
-					// finché la chiave di nodocorr->right è minore di key
-					while (nodocorr->right != nullptr && key > nodocorr->right->key)
-					{
-						nodocorr = nodocorr->right;
-					}
-					 
+					
 					this->ptr = nodocorr;
 					return;
 				}
@@ -421,6 +412,44 @@ public:
 		// empty destuctor
 		~ReverseIterator() {};
 
+		// needs more work
+		void recforward(Node<Key, Value>* node, Key initialKey) {
+			
+			// ok
+			if (node->left != nullptr) {
+				// go left and then try to go right
+				node = node->left;
+				while (node->right != nullptr) {
+					node = node->right;
+				}
+				this->ptr = node;
+				return;
+			}
+			// not ok
+			if (node->parent != nullptr) {
+				// check that is not the last node
+				bool left = node->isLeftSon();
+				if (left) {
+					this->ptr = nullptr;
+					return;
+					// end of binary tree reached
+				}
+				node = node->parent;
+
+				// se la chiave del parent è maggiore
+				if (node->key > initialKey) {
+					recforward(node->parent, initialKey);
+				}
+				else {
+					this->ptr = node;
+					return;
+				}
+				return;
+			}
+			this->ptr = nullptr;
+			return;
+
+		}
 		// operators definitions
 		void operator++(int) {
 			if (this->ptr == nullptr) return;
@@ -429,7 +458,7 @@ public:
 			if (nodocorr->left != nullptr)
 			{
 				nodocorr = nodocorr->left;
-				while (nodocorr->right != nullptr && nodocorr->right->key > key)
+				while (nodocorr->right != nullptr && nodocorr->right->key < key)
 				{
 					nodocorr = nodocorr->right;
 				}
@@ -450,21 +479,24 @@ public:
 							this->ptr = nullptr;
 							return;
 						}
+						
 						nodocorr = nodocorr->parent;
+						// more steps?
 					}
-
+					/*
 					// finché la chiave di nodocorr->right è minore di key
 					while (nodocorr->right != nullptr && key > nodocorr->right->key)
 					{
 						nodocorr = nodocorr->right;
 					}
-					 
+					*/
 					this->ptr = nodocorr;
 					return;
 				}
 				this->ptr = nullptr;
 			}
 		};
+		
 		void operator--(int) {
 			if (this->ptr == nullptr) return;
 			Node<Key, Value>* nodocorr = this->ptr;

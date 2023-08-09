@@ -350,6 +350,17 @@ public:
 			}
 		}
 
+		Iterator& operator+(const int& value) const {
+			for (int i = 0; i < value; i++) {
+				this->operator++();
+			}
+		}
+		Iterator& operator-(const int& value) const {
+			for (int i = 0; i < value; i++) {
+				this->operator--();
+			}
+		}
+
 		Node<Key, Value>* operator->()
 		{
 			return this->ptr;
@@ -499,6 +510,18 @@ public:
 				}
 			}
 		};
+
+		ReverseIterator& operator+(const int& value) const {
+			for (int i = 0; i < value; i++) {
+				this->operator++();
+			}
+		}
+
+		ReverseIterator& operator-(const int& value) const {
+			for (int i = 0; i < value; i++) {
+				this->operator--();
+			}
+		}
 
 		Node<Key, Value>* operator->()
 		{

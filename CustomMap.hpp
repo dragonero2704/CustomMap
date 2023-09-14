@@ -1,7 +1,7 @@
 #pragma once
 #ifndef NODE_INCLUDE
 #define NODE_INCLUDE
-#include "CustomNode.h"
+#include "CustomNode.hpp"
 #endif
 /*
 #include "macros.h"

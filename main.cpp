@@ -1,5 +1,5 @@
 #include <iostream>
-#include "CustomMap.h"
+#include "CustomMap.hpp"
 
 #include "macros.h"
 #include <time.h>

@@ -8,7 +8,7 @@
 #include <iostream>
 using namespace std;
 */
-
+typedef unsigned long long  size_t;
 template <class Key, class Value>
 class CustomMap
 {

@@ -11,8 +11,6 @@ using namespace std;
 
 
 int main() {
-	// info("Hello");
-
 	CustomMap<int, int>mp(1,1);
 	info("false: %d", false);
 	info("Empty? %d", mp.isempty());

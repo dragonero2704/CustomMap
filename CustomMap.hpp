@@ -1,4 +1,4 @@
-#pragma once
+#include <functional>
 #ifndef NODE_INCLUDE
 #define NODE_INCLUDE
 #include "CustomNode.hpp"
@@ -8,34 +8,40 @@
 #include <iostream>
 using namespace std;
 */
-typedef unsigned long long  size_t;
-template <class Key, class Value>
+typedef unsigned long long size_t;
+template <class Key, class Value, class Comparator = std::greater<Key>>
 class CustomMap
 {
 private:
-	Node<Key, Value>* root;
+	Node<Key, Value> *root;
 	size_t _size;
+	Comparator comparator;
 
 	// in this function the node is inserted and then the balancing operations are executed based on the position of the new node
-	void realInsert(Node<Key, Value>* node) {
-		if (this->root == nullptr) {
+	void realInsert(Node<Key, Value> *node)
+	{
+		if (this->root == nullptr)
+		{
 			this->root = node;
 		}
 		else
 		{
-			Node<Key, Value>* tmp = this->root;
-			Node<Key, Value>* tmpParent = tmp->parent;
+			Node<Key, Value> *tmp = this->root;
+			Node<Key, Value> *tmpParent = tmp->parent;
 			this->_size++;
-			while (tmp != nullptr) {
+			while (tmp != nullptr)
+			{
 				// if a node is found with the same key, the value of the already existing node is modified
-				if (node->key == tmp->key) 
+				if (node->key == tmp->key)
 				{
 					this->_size--;
 					tmp->value = node->value;
 					return;
-				} 
-				if (node->key > tmp->key) {
-					//go right
+				}
+				// if (node->key > tmp->key)
+				if (this->comparator(node->key, tmp->key))
+				{
+					// go right
 					tmpParent = tmp;
 					tmp = tmp->right;
 				}
@@ -46,192 +52,236 @@ private:
 					tmp = tmp->left;
 				}
 			}
-			if (node->key > tmpParent->key) {
-				//right
+			// if (node->key > tmpParent->key)
+			if (this->comparator(node->key, tmpParent->key))
+			{
+				// right
 				node->parent = tmpParent;
 				tmpParent->right = node;
 			}
-			else {
-				//left
+			else
+			{
+				// left
 				node->parent = tmpParent;
 				tmpParent->left = node;
 			}
-			//correctly inserted
+			// correctly inserted
 		}
-		//RB balacing cases
+		// RB balacing cases
 		case1(node);
 	};
 
-	void case1(Node<Key, Value>* node) {
+	void case1(Node<Key, Value> *node)
+	{
 		// info("Case 1");
 		if (node->parent == nullptr)
 			node->color = BLACK;
 		else
 			case2(node);
 	};
-	void case2(Node<Key, Value>* node) {
+	void case2(Node<Key, Value> *node)
+	{
 		// info("Case 2");
-		if (node->parent->color == BLACK) return;
-		else case3(node);
+		if (node->parent->color == BLACK)
+			return;
+		else
+			case3(node);
 	};
-	void case3(Node<Key, Value>* node) {
+	void case3(Node<Key, Value> *node)
+	{
 		// info("Case 3");
-		if (node->uncle() != nullptr && node->uncle()->color == RED) {
+		if (node->uncle() != nullptr && node->uncle()->color == RED)
+		{
 			node->parent->color = BLACK;
 			node->uncle()->color = BLACK;
 			node->grandparent()->color = RED;
 			case1(node->grandparent());
 		}
-		else case4(node);
+		else
+			case4(node);
 	};
-	void case4(Node<Key, Value>* node) {
-		//info("Case 4");
-		if (node == node->parent->right && node->parent == node->grandparent()->left) {
+	void case4(Node<Key, Value> *node)
+	{
+		// info("Case 4");
+		if (node == node->parent->right && node->parent == node->grandparent()->left)
+		{
 			rotateLeft(node);
 			node = node->left;
 		}
-		else if (node == node->parent->left && node->parent == node->grandparent()->right) {
+		else if (node == node->parent->left && node->parent == node->grandparent()->right)
+		{
 			rotateRight(node);
 			node = node->right;
 		}
 		case5(node);
 	};
-	void case5(Node<Key, Value>* node) {
+	void case5(Node<Key, Value> *node)
+	{
 		// info("Case 5");
 		node->parent->color = BLACK;
 		node->grandparent()->color = RED;
-		if (node == node->parent->left && node->parent == node->grandparent()->left) {
+		if (node == node->parent->left && node->parent == node->grandparent()->left)
+		{
 			rotateRight(node->parent);
 		}
-		else {
+		else
+		{
 			rotateLeft(node->parent);
 		}
 	};
 
 	// tree left rotation
-	void rotateLeft(Node<Key, Value>* pivot) {
-		Node<Key, Value>* root = pivot->parent;
-		Node<Key, Value>* oldLeft = pivot->left;
-		Node<Key, Value>* grandParent = pivot->parent->parent;
+	void rotateLeft(Node<Key, Value> *pivot)
+	{
+		Node<Key, Value> *root = pivot->parent;
+		Node<Key, Value> *oldLeft = pivot->left;
+		Node<Key, Value> *grandParent = pivot->parent->parent;
 
 		// this piece of code determines if the root has a parent, it is a right son or a left son
 		bool left = grandParent != nullptr ? root->isLeftSon() : 0;
-		
+
 		// pivot becomes the new root
 		pivot->left = root;
 		root->parent = pivot;
 
-		//oldLeft becomes root->right (before root->right was pivot)
+		// oldLeft becomes root->right (before root->right was pivot)
 		root->right = oldLeft;
-		if(oldLeft != nullptr) oldLeft->parent = root;
+		if (oldLeft != nullptr)
+			oldLeft->parent = root;
 
 		// now we need to link pivot->parent with grandParent
 		pivot->parent = grandParent;
-		if (grandParent != nullptr) {
-			if (left) {
+		if (grandParent != nullptr)
+		{
+			if (left)
+			{
 				grandParent->left = pivot;
 			}
-			else {
+			else
+			{
 				grandParent->right = pivot;
 			}
 		}
-		else {
+		else
+		{
 			// if grandParent is nullptr, then pivot is the new main root of the tree
 			this->root = pivot;
 		}
-		
 	}
 
 	// tree right rotation
-	void rotateRight(Node<Key, Value>* pivot) {
-		Node<Key, Value>* root = pivot->parent;
-		Node<Key, Value>* oldRight = pivot->right;
-		Node<Key, Value>* grandParent = pivot->parent->parent;
-		
+	void rotateRight(Node<Key, Value> *pivot)
+	{
+		Node<Key, Value> *root = pivot->parent;
+		Node<Key, Value> *oldRight = pivot->right;
+		Node<Key, Value> *grandParent = pivot->parent->parent;
+
 		bool left = grandParent != nullptr ? root->isLeftSon() : 0;
-		
+
 		// pivot becomes the new root
 		pivot->right = root;
 		root->parent = pivot;
 
-		//oldRight becomes root->right (before root->right was pivot)
+		// oldRight becomes root->right (before root->right was pivot)
 		root->left = oldRight;
-		if (oldRight != nullptr)oldRight->parent = root;
+		if (oldRight != nullptr)
+			oldRight->parent = root;
 
 		// now we need to link pivot->parent with grandParent
 		pivot->parent = grandParent;
-		if (grandParent != nullptr) {
-			if (left) {
+		if (grandParent != nullptr)
+		{
+			if (left)
+			{
 				grandParent->left = pivot;
 			}
-			else {
+			else
+			{
 				grandParent->right = pivot;
 			}
 		}
-		else {
+		else
+		{
 			// if grandParent is nullptr, then pivot is the new main root of the tree
 			this->root = pivot;
 		}
 	}
 
 	// recursive delete function
-	void recDelete(Node<Key, Value>* node) {
-		if (node->left != nullptr) this->recDelete(node->left);
-		if (node->right != nullptr) this->recDelete(node->right);
+	void recDelete(Node<Key, Value> *node)
+	{
+		if (node->left != nullptr)
+			this->recDelete(node->left);
+		if (node->right != nullptr)
+			this->recDelete(node->right);
 		delete node;
 	};
 
 public:
-	//costructors definitions
-	CustomMap(void) {
+	// costructors definitions
+	CustomMap(void)
+	{
 		this->root = nullptr;
 		this->_size = 0;
 	};
-	CustomMap(Key key, Value value) {
+	CustomMap(Key key, Value value)
+	{
 		this->root = new Node<Key, Value>(key, value);
 		this->root->color = BLACK;
 		this->_size = 1;
 	};
 
 	// recursive deletion function
-	~CustomMap() {
-		if (this->root != nullptr) this->recDelete(this->root);
+	~CustomMap()
+	{
+		if (this->root != nullptr)
+			this->recDelete(this->root);
 	};
 
-	bool isempty(void) {
+	bool isempty(void)
+	{
 		return this->_size == 0;
 	};
 
-	size_t size(void) {
+	size_t size(void)
+	{
 		return this->_size;
 	};
 
-	// insertion function if key and value are supplied 
-	void insert(Key key, Value value) {
-		Node<Key, Value>* node = new Node<Key, Value>(key, value);
+	// insertion function if key and value are supplied
+	void insert(Key key, Value value)
+	{
+		Node<Key, Value> *node = new Node<Key, Value>(key, value);
 		this->realInsert(node);
 	};
 
-	// insertion function if a Node is supplied 
-	void insert(Node<Key, Value> node) {
+	// insertion function if a Node is supplied
+	void insert(Node<Key, Value> node)
+	{
 		this->realInsert(&node);
 	};
 
-	Value& operator[](Key key) {
-		if (this->root == nullptr) {
+	Value &operator[](const Key& key)
+	{
+		if (this->root == nullptr)
+		{
 			this->root = new Node<Key, Value>(key, Value());
 			return this->root->value;
 		}
 
-		Node<Key, Value>* tmp = this->root;
-		if (tmp->key == key) return tmp->value;
+		Node<Key, Value> *tmp = this->root;
+		if (tmp->key == key)
+			return tmp->value;
 
-		while (tmp->key != key) {
-			if (key > tmp->key) {
+		while (tmp->key != key)
+		{
+			if (key > tmp->key)
+			{
 				// go right
 				tmp = tmp->right;
 			}
-			else {
+			else
+			{
 				// go left
 				tmp = tmp->left;
 			}
@@ -239,38 +289,46 @@ public:
 			{
 				// if the element is not found, a new node is inserted in the tree with defualt value and the key supplied
 				// then a reference to the node->value is returned so it can be changed in the code
-				Node<Key, Value>* node = new Node<Key, Value>(key, Value());
+				Node<Key, Value> *node = new Node<Key, Value>(key, Value());
 				this->realInsert(node);
 				return node->value;
 			}
 		}
 		return tmp->value;
 	};
-	void empty() {
-		if(this->root!=nullptr) this->recDelete(this->root);
+	void empty()
+	{
+		if (this->root != nullptr)
+			this->recDelete(this->root);
 		this->_size = 0;
 	}
 
 	// iterator class definition
-	class Iterator {
+	class Iterator
+	{
 	private:
-		Node<Key, Value>* ptr;
+		Node<Key, Value> *ptr;
+
 	public:
 		// constructor definitions
-		Iterator() {
+		Iterator()
+		{
 			this->ptr = nullptr;
 		};
-		Iterator(Node<Key, Value>* node) {
+		Iterator(Node<Key, Value> *node)
+		{
 			this->ptr = node;
 		};
 
-		//empty destructor
-		~Iterator() {};
+		// empty destructor
+		~Iterator(){};
 
 		// operators definitions
-		void operator++(int) {
-			if (this->ptr == nullptr) return;
-			Node<Key, Value>* nodocorr = this->ptr;
+		void operator++(int)
+		{
+			if (this->ptr == nullptr)
+				return;
+			Node<Key, Value> *nodocorr = this->ptr;
 
 			Key key = this->ptr->key;
 			if (nodocorr->right != nullptr)
@@ -310,9 +368,11 @@ public:
 			}
 		}
 
-		void operator--(int) {
-			if (this->ptr == nullptr) return;
-			Node<Key, Value>* nodocorr = this->ptr;
+		void operator--(int)
+		{
+			if (this->ptr == nullptr)
+				return;
+			Node<Key, Value> *nodocorr = this->ptr;
 			Key key = ptr->key;
 			if (nodocorr->left != nullptr)
 			{
@@ -340,7 +400,6 @@ public:
 						}
 
 						nodocorr = nodocorr->parent;
-
 					}
 
 					this->ptr = nodocorr;
@@ -350,87 +409,107 @@ public:
 			}
 		}
 
-		Iterator& operator+(const int& value) const {
-			for (int i = 0; i < value; i++) {
+		Iterator &operator+(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
 				this->operator++();
 			}
 		}
-		Iterator& operator-(const int& value) const {
-			for (int i = 0; i < value; i++) {
+		Iterator &operator-(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
 				this->operator--();
 			}
 		}
 
-		Node<Key, Value>* operator->()
+		Node<Key, Value> *operator->()
 		{
 			return this->ptr;
 		}
-		Node<Key, Value>* operator*()
+		Node<Key, Value> *operator*()
 		{
 			return this->ptr;
 		}
 
-		bool operator!=(Iterator other) const {
+		bool operator!=(Iterator other) const
+		{
 			return *other != this->ptr;
 		}
-		bool operator==(Iterator other) const  {
+		bool operator==(Iterator other) const
+		{
 			return *other == this->ptr;
 		}
 	};
 
 	// returns an iterator to the smallest key
-	Iterator begin() {
-		if (this->root == nullptr) return Iterator();
-		Node<Key, Value>* tmp = this->root;
-		while (tmp->left != nullptr) {
+	Iterator begin()
+	{
+		if (this->root == nullptr)
+			return Iterator();
+		Node<Key, Value> *tmp = this->root;
+		while (tmp->left != nullptr)
+		{
 			tmp = tmp->left;
 		}
 		return Iterator(tmp);
-		
 	}
 
 	// returns an iterator with its ptr property = nullptr
-	Iterator end(){
+	Iterator end()
+	{
 		return Iterator();
 	}
 
-	Iterator find(Key k) {
-		Node<Key, Value>* tmp = this->root;
-		
-		while (tmp->key != k) {
+	Iterator find(Key k)
+	{
+		Node<Key, Value> *tmp = this->root;
 
-			if (k > tmp->key) {
+		while (tmp->key != k)
+		{
+
+			if (k > tmp->key)
+			{
 				// go right
 				tmp = tmp->right;
 			}
-			else {
+			else
+			{
 				// go left
 				tmp = tmp->left;
 			}
-			if (tmp == nullptr) return this->end();
+			if (tmp == nullptr)
+				return this->end();
 		}
 		return Iterator(tmp);
 	};
 
 	// ReverseIterator class definition
-	class ReverseIterator {
+	class ReverseIterator
+	{
 	private:
-		Node<Key, Value>* ptr;
+		Node<Key, Value> *ptr;
+
 	public:
 		// constructors defintions
-		ReverseIterator() {
+		ReverseIterator()
+		{
 			this->ptr = nullptr;
 		};
-		ReverseIterator(Node<Key, Value>* node) {
+		ReverseIterator(Node<Key, Value> *node)
+		{
 			this->ptr = node;
 		};
 		// empty destuctor
-		~ReverseIterator() {};
+		~ReverseIterator(){};
 
 		// operators definitions
-		void operator++(int) {
-			if (this->ptr == nullptr) return;
-			Node<Key, Value>* nodocorr = this->ptr;
+		void operator++(int)
+		{
+			if (this->ptr == nullptr)
+				return;
+			Node<Key, Value> *nodocorr = this->ptr;
 			Key key = ptr->key;
 			if (nodocorr->left != nullptr)
 			{
@@ -456,21 +535,22 @@ public:
 							this->ptr = nullptr;
 							return;
 						}
-						
+
 						nodocorr = nodocorr->parent;
-						
 					}
-				
+
 					this->ptr = nodocorr;
 					return;
 				}
 				this->ptr = nullptr;
 			}
 		};
-		
-		void operator--(int) {
-			if (this->ptr == nullptr) return;
-			Node<Key, Value>* nodocorr = this->ptr;
+
+		void operator--(int)
+		{
+			if (this->ptr == nullptr)
+				return;
+			Node<Key, Value> *nodocorr = this->ptr;
 
 			Key key = this->ptr->key;
 			if (nodocorr->right != nullptr)
@@ -504,55 +584,64 @@ public:
 					{
 						nodocorr = nodocorr->left;
 					}
-					 
+
 					this->ptr = nodocorr;
 					return;
 				}
 			}
 		};
 
-		ReverseIterator& operator+(const int& value) const {
-			for (int i = 0; i < value; i++) {
+		ReverseIterator &operator+(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
 				this->operator++();
 			}
 		}
 
-		ReverseIterator& operator-(const int& value) const {
-			for (int i = 0; i < value; i++) {
+		ReverseIterator &operator-(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
 				this->operator--();
 			}
 		}
 
-		Node<Key, Value>* operator->()
+		Node<Key, Value> *operator->()
 		{
 			return this->ptr;
 		}
-		Node<Key, Value>* operator*()
+		Node<Key, Value> *operator*()
 		{
 			return this->ptr;
 		}
 
-		bool operator!=(ReverseIterator other) const {
+		bool operator!=(ReverseIterator other) const
+		{
 			return *other != this->ptr;
 		}
-		bool operator==(ReverseIterator other) const {
+		bool operator==(ReverseIterator other) const
+		{
 			return *other == this->ptr;
 		}
-		
 	};
 
 	// returns an iterator to the largest key in the tree
-	ReverseIterator rbegin() {
-		Node<Key, Value>* tmp = this->root;
-		if (tmp == nullptr) return ReverseIterator();
+	ReverseIterator rbegin()
+	{
+		Node<Key, Value> *tmp = this->root;
+		if (tmp == nullptr)
+			return ReverseIterator();
 
-		while (tmp->right != nullptr) {
+		while (tmp->right != nullptr)
+		{
 			tmp = tmp->right;
 		}
 		return ReverseIterator(tmp);
 	}
 
-	ReverseIterator rend() {
+	ReverseIterator rend()
+	{
 		return ReverseIterator();
 	}
 };

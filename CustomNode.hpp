@@ -8,7 +8,7 @@ template <class Key, class Value>
 class Node
 {
 	// this way the CustomMap class can access private attributes and methods
-	template <class _Key, class _Value>
+	template <class _Key, class _Value, class _Comparator>
 	friend class CustomMap;
 private:
 	// key of the Node, used to build the binary tree

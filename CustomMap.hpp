@@ -217,6 +217,59 @@ private:
 		delete node;
 	};
 
+	class BaseIterator
+	{
+	protected:
+		Node<Key, Value> *ptr;
+
+	public:
+		// constructor definitions
+		BaseIterator()
+		{
+			this->ptr = nullptr;
+		};
+		BaseIterator(Node<Key, Value> *node)
+		{
+			this->ptr = node;
+		};
+
+		// empty destructor
+		~BaseIterator(){};
+
+		BaseIterator &operator+(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
+				this->operator++();
+			}
+		}
+		BaseIterator &operator-(const int &value) const
+		{
+			for (int i = 0; i < value; i++)
+			{
+				this->operator--();
+			}
+		}
+
+		Node<Key, Value> *operator->()
+		{
+			return this->ptr;
+		}
+		Node<Key, Value> *operator*()
+		{
+			return this->ptr;
+		}
+
+		bool operator!=(BaseIterator other) const
+		{
+			return *other != this->ptr;
+		}
+		bool operator==(BaseIterator other) const
+		{
+			return *other == this->ptr;
+		}
+	};
+
 public:
 	// costructors definitions
 	CustomMap(void)
@@ -261,7 +314,7 @@ public:
 		this->realInsert(&node);
 	};
 
-	Value &operator[](const Key& key)
+	Value &operator[](const Key &key)
 	{
 		if (this->root == nullptr)
 		{
@@ -304,17 +357,15 @@ public:
 	}
 
 	// iterator class definition
-	class Iterator
+	class Iterator : public BaseIterator
 	{
-	private:
-		Node<Key, Value> *ptr;
-
 	public:
 		// constructor definitions
 		Iterator()
 		{
 			this->ptr = nullptr;
 		};
+		// <3
 		Iterator(Node<Key, Value> *node)
 		{
 			this->ptr = node;
@@ -322,7 +373,6 @@ public:
 
 		// empty destructor
 		~Iterator(){};
-
 		// operators definitions
 		void operator++(int)
 		{
@@ -367,13 +417,12 @@ public:
 				}
 			}
 		}
-
 		void operator--(int)
 		{
 			if (this->ptr == nullptr)
 				return;
 			Node<Key, Value> *nodocorr = this->ptr;
-			Key key = ptr->key;
+			Key key = this->ptr->key;
 			if (nodocorr->left != nullptr)
 			{
 				nodocorr = nodocorr->left;
@@ -407,39 +456,6 @@ public:
 				}
 				this->ptr = nullptr;
 			}
-		}
-
-		Iterator &operator+(const int &value) const
-		{
-			for (int i = 0; i < value; i++)
-			{
-				this->operator++();
-			}
-		}
-		Iterator &operator-(const int &value) const
-		{
-			for (int i = 0; i < value; i++)
-			{
-				this->operator--();
-			}
-		}
-
-		Node<Key, Value> *operator->()
-		{
-			return this->ptr;
-		}
-		Node<Key, Value> *operator*()
-		{
-			return this->ptr;
-		}
-
-		bool operator!=(Iterator other) const
-		{
-			return *other != this->ptr;
-		}
-		bool operator==(Iterator other) const
-		{
-			return *other == this->ptr;
 		}
 	};
 
@@ -486,11 +502,8 @@ public:
 	};
 
 	// ReverseIterator class definition
-	class ReverseIterator
+	class ReverseIterator : public BaseIterator
 	{
-	private:
-		Node<Key, Value> *ptr;
-
 	public:
 		// constructors defintions
 		ReverseIterator()
@@ -510,7 +523,7 @@ public:
 			if (this->ptr == nullptr)
 				return;
 			Node<Key, Value> *nodocorr = this->ptr;
-			Key key = ptr->key;
+			Key key = this->ptr->key;
 			if (nodocorr->left != nullptr)
 			{
 				nodocorr = nodocorr->left;
@@ -590,40 +603,6 @@ public:
 				}
 			}
 		};
-
-		ReverseIterator &operator+(const int &value) const
-		{
-			for (int i = 0; i < value; i++)
-			{
-				this->operator++();
-			}
-		}
-
-		ReverseIterator &operator-(const int &value) const
-		{
-			for (int i = 0; i < value; i++)
-			{
-				this->operator--();
-			}
-		}
-
-		Node<Key, Value> *operator->()
-		{
-			return this->ptr;
-		}
-		Node<Key, Value> *operator*()
-		{
-			return this->ptr;
-		}
-
-		bool operator!=(ReverseIterator other) const
-		{
-			return *other != this->ptr;
-		}
-		bool operator==(ReverseIterator other) const
-		{
-			return *other == this->ptr;
-		}
 	};
 
 	// returns an iterator to the largest key in the tree
